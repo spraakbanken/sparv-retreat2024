@@ -1,10 +1,10 @@
-# Install and run Sparv
+# Install Sparv
 
 Install Sparv on your computer if you haven't already done so. Follow the
-[installation instructions in the manual](https://spraakbanken.gu.se/sparv/#/user-manual/quick-start).
+[_Installation_ section of the Quick Start Guide in the manual](https://spraakbanken.gu.se/sparv/#/user-manual/quick-start).
 
-Complete the whole quick start guide (except the *What's Next?* chapter), to get familiar with creating a corpus and a
-config file, and to make sure that Sparv works.
+You don't have to follow the rest of the Quick Start guide, since a corpus has already been prepared for you for this
+exercise, but please read through it just to get familiar with how creating a corpus for Sparv works.
 
 > [!IMPORTANT]
 > Remember to always use UTF-8 when saving any YAML, Python or XML files during these exercises.
@@ -13,8 +13,7 @@ config file, and to make sure that Sparv works.
 
 Download the [example corpus](https://github.com/spraakbanken/sparv-retreat2024/raw/main/djurkorpus.zip).
 This is the corpus we will use to test the Sparv plugin we will create.
-Create a new corpus folder and unzip the example corpus there. Your corpus folder should now look like this
-(but probably with another name):
+Unzip the downloaded file, which should give you a complete corpus folder with the following contents:
 
 ```
 djurkorpus
@@ -26,6 +25,12 @@ djurkorpus
 ```
 
 In addition to the three corpus texts, you also get a Sparv corpus configuration file.
+
+# Run the example corpus through Sparv
+
+In your terminal, navigate to the `djurkorpus` folder. Run Sparv on the corpus by using the command `sparv run`.
+If everything works, Sparv will now create a few folders, among them the folder `export`
+containing the final result. Have a look at one of the XML files there!
 
 # Get the Sparv Plugin Template (and create a repository)
 
@@ -101,13 +106,34 @@ Just remember to not move or rename the folder containing your plugin after this
 ## Have a look at the code
 
 The plugin template already comes with a simple example annotator. This annotator creates a new annotation on the
-token level, annotating every token with an uppercase version of itself. Open the file `uppercase.py` to look at the
-code.
+token level, annotating every token with an uppercase version of itself. Open the file `uppercase.py` and let's have
+a look at the code:
 
-The `@annotator` decorator is what makes an annotator function an annotator, and is what registers it with Sparv.
+```py
+from sparv.api import Annotation, Output, annotator
+
+@annotator("Convert every word to uppercase")
+def uppercase(
+    word: Annotation = Annotation("<token:word>"),
+    out: Output = Output("<token>:sbx_uppercase.upper"),
+):
+    """Convert to uppercase."""
+    out.write([val.upper() for val in word.read()])
+```
+
+The `@annotator` decorator is what makes an annotator function an annotator, and it is what makes the annotator known to
+Sparv.
+
 What an annotator takes as input and
-produces as output is declared by the signature of the function, i.e. the parameters and their type hints, using
-special Sparv classes like `Annotation` and `Output`. The decorators and classes are all imported from `sparv.api`.
+produces as output is declared by the signature of the function, i.e. the parameters and their type hints and
+default values, using special Sparv classes like `Annotation` (for input) and `Output` (for output).
+
+Looking at the parameters we can see that the uppercase annotator takes `<token:word>` as input, which is the text
+content of all the token spans, and produces the
+output `<token>:sbx_uppercase.upper`, which is a new annotation attached to the existing token spans. Don't worry if the
+annotation names look confusing; it will be explained soon!
+
+The decorators and classes are all imported from `sparv.api`.
 As you can see in the code, reading and writing the annotations involve the methods `read()` and `write()`.
 
 You can learn more about this by reading the section [_Module Code_](https://spraakbanken.gu.se/sparv/#/developers-guide/writing-sparv-plugins?id=module-code)
@@ -133,10 +159,13 @@ Sparv works with two types of annotations:
 You can think of span annotations as XML elements, and attribute annotations as XML attributes.
 
 Annotations in Sparv are referred to like this: `module_name.annotation`. For example, the default tokenizer is
-provided by the module named `segment` and produces the annotation `segment.token`.
+provided by the module named `segment` and produces the annotation `segment.token`. The module name of our plugin
+(unless you changed it) is `sbx_uppercase`, so all its outputs will have to use that prefix.
 
 _Attribute annotations_ are always attached to a span annotation, separated by a colon. For example, the Stanza module's
 part-of-speech annotation attached to the previously mentioned tokens would look like this: `segment.token:stanza.pos`.
+
+When exporting the final XML result, Sparv will by default remove the prefixes (unless there is a name collision).
 
 ### Annotation classes
 
@@ -288,7 +317,7 @@ def text_nouns(
 
 Now try your new annotator, just like before!
 
-# Bonus task: Add an exporter
+# Bonus task 1: Add an exporter
 
 Sparv supports a lot of different export formats. Usually they contain the text of the corpus and its annotations, like
 the XML files we've been creating so far. But Sparv also creates CSV files with
@@ -311,6 +340,21 @@ not annotation classes!)
   to get your noun count for every source file.
 - Use [`Export`](https://spraakbanken.gu.se/sparv/#/developers-guide/sparv-classes?id=export) for your output.
   Export files are not written using any special Sparv methods, but are instead created using regular Python methods.
+
+# Bonus task 2: Make your plugin configurable
+
+Let's make your plugin a little more interesting by making it configurable. Instead of always counting nouns, make
+it possible to select which part-of-speech to count. When you are done, you should be able to change this setting by
+adding a section like this to the corpus configuration file:
+
+```yaml
+sbx_uppercase:
+  pos: VB
+```
+
+For details on how to make things configurable, read about [_Config Parameters_](https://spraakbanken.gu.se/sparv/#/developers-guide/config-parameters)
+in the documentation. See also the documentation about the [`Config`](https://spraakbanken.gu.se/sparv/#/developers-guide/sparv-classes?id=config)
+class.
 
 # How do I create something actually useful?
 
