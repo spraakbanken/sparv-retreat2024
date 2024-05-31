@@ -98,7 +98,7 @@ If you installed Sparv using `pipx`, install the plugin by running the following
 If you installed Sparv using `pip`, hopefully in a virtual environment, activate that environment and install the plugin
 using pip:
 
-`pip install -e sparv-pipeline /path/to/my-plugin-folder`
+`pip install -e /path/to/my-plugin-folder`
 
 By using the `-e` flag, or `--editable`, you don't have to re-install the plugin everytime you make changes to the code.
 Just remember to not move or rename the folder containing your plugin after this.
@@ -236,7 +236,7 @@ them. To quote the documentation for `get_children()`:
 > list of indices in the child annotation. The second one is a list of orphans, i.e. containing indices in the
 > child annotation that have no parent.
 
-Here is a short example of how to traverse the sentences and their children.
+Here is a short example of how to traverse the sentences and their children (i.e. tokens).
 Below that, hidden behind the spoiler warning, is an almost complete example of an annotator, but only use
 that if you really need it!
 ```py
