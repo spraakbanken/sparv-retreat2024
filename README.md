@@ -135,8 +135,17 @@ annotation names look confusing; it will be explained soon!
 
 The decorators and classes are all imported from `sparv.api`.
 As you can see in the code, reading and writing the annotations involve the methods `read()` and `write()`.
+The body of the function, which is written as one line here, could be rewritten as the following, which may be easier to
+understand:
 
-You can learn more about this by reading the section [_Module Code_](https://spraakbanken.gu.se/sparv/#/developers-guide/writing-sparv-plugins?id=module-code)
+```py
+result = []
+for val in word.read():
+    result.append(val.upper())
+out.write(result)
+```
+
+You can learn more about how to write plugin code by reading the section [_Module Code_](https://spraakbanken.gu.se/sparv/#/developers-guide/writing-sparv-plugins?id=module-code)
 in the manual.
 For details about available methods on the Sparv classes, see the
 [_Sparv Classes_](https://spraakbanken.gu.se/sparv/#/developers-guide/sparv-classes) section.
@@ -165,7 +174,12 @@ provided by the module named `segment` and produces the annotation `segment.toke
 _Attribute annotations_ are always attached to a span annotation, separated by a colon. For example, the Stanza module's
 part-of-speech annotation attached to the previously mentioned tokens would look like this: `segment.token:stanza.pos`.
 
-When exporting the final XML result, Sparv will by default remove the prefixes (unless there is a name collision).
+When exporting the final XML result, Sparv will by default remove the prefixes (unless there is a name collision). The
+`<token>:sbx_uppercase.upper` annotation will look like this in the XML result:
+
+```xml
+<token upper="ARBITRARY">arbitrary</token>
+```
 
 ### Annotation classes
 
@@ -205,9 +219,10 @@ do. Some examples:
 
 ## Update your corpus configuration to use the new annotation
 
-Now that you've added support for a new annotation in your plugin, you need to update your corpus configration file
+Now that you've added support for a new annotation in your plugin, you need to update your corpus configuration file
 (`config.yaml`) to tell
-Sparv to use the new annotation. Add your annotation to the `export.annotations` list. In the example below, we've
+Sparv to use the new annotation. The section `export.annotations` in the config file tells Sparv what annotations
+to include in the end result. Add your new annotation to that list. In the example below, we've
 added the uppercase annotation `<token>:sbx_uppercase.upper`:
 
 ```yaml
