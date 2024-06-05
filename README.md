@@ -233,8 +233,8 @@ export:
     - <token>:sbx_uppercase.upper
 ```
 
-In your corpus folder, run `sparv clean -e` to remove any existing previous results, and then run `sparv run`
-to create new export files containing your new annotation. Check them out!
+In your corpus folder, run `sparv clean --all` to remove any existing previous annotation files and results,
+and then run `sparv run` to create new export files containing your new annotation. Check them out!
 
 # Task 2: Create a sentence-based annotator
 
@@ -281,16 +281,19 @@ def sentence_nouns(
     for s in sentences:
         for w in s:
             # Do something with pos_list[w] here
-        output.append(count)  # Append count to result
+        output.append(str(count))  # Append count to result (needs to be a string)
 
     out.write(output)
 ```
 </details>
 
+> [!IMPORTANT]
+> Annotation values must be saved as strings, so remember to convert the sum into a string.
+
 When you are done, update your corpus configuration file and try your new annotation. If you want, you can also add
 `<token:pos>` to the list of annotations to include. The part-of-speech annotation will be created either way, as it
 is needed by your new annotator, but it won't be included in the result unless you ask for it.
-Remember to run `sparv clean -e` first, so Sparv knows it needs to create new export files.
+Remember to run `sparv clean --all` first, so Sparv knows it needs to rerun the annotations.
 
 # Task 3: Add an annotator on the text level
 
@@ -301,7 +304,7 @@ _Annotate each text with its total number of nouns_, not by counting tokens agai
 previous sentence noun counter annotation as input.
 
 > [!IMPORTANT]
-> - All annotation values are currently saved as strings. When you read your previous noun counts,
+> - All annotation values are saved as strings. When you read your previous noun counts,
 >   you must convert them to integers before adding them together.
 > 
 > - Don't try to directly call the function you made in the previous exercise.
